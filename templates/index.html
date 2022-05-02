@@ -1,0 +1,88 @@
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+        <script src="{{url_for('static', filename='jquery.js')}}"></script>
+
+    </head>
+
+    <body>
+
+        <div id="comm"><p>NO COMMANDS</p></div>
+        <video id="myVidPlayer" style="display:block; margin: 0 auto;" muted autoplay></video>
+    </body>
+
+<script>
+var airHorn = new Audio("{{url_for('static', filename='Air_Horn.mp3')}}");
+var scooby = new Audio("{{url_for('static', filename='Scooby_Run.mp3')}}");
+var among = new Audio("{{url_for('static', filename='Among_Us.mp3')}}");
+var ok = new Audio("{{url_for('static', filename='LJ_Okay.mp3')}}");
+var yeah = new Audio("{{url_for('static', filename='LJ_Yeah.mp3')}}");
+var eat = new Audio("{{url_for('static', filename='Minecraft_Eating.mp3')}}");
+var oof = new Audio("{{url_for('static', filename='OOF.mp3')}}");
+
+// Script to POST to Flask in python on key input from html
+var moving = false
+$(document).ready(function() {
+    $(document).keydown(function(e) {
+        console.log(e.key);
+        if (e.key == '1') {
+            airHorn.play();
+        } else if (e.key == '2') {
+            scooby.play();
+        } else if (e.key == '3') {
+            among.play();
+        } else if (e.key == '4') {
+            ok.play();
+        } else if (e.key == '5') {
+            yeah.play();
+        } else if (e.key == '6') {
+            eat.play();
+        } else if (e.key == '7') {
+            oof.play();
+        } else if (moving == false) {
+            moving = true;
+            if (e.key == "c") {
+                if (document.getElementById("comm").innerText != "CHIEF KEEF MODE") {
+                    document.getElementById("comm").innerHTML = "<p>CHIEF KEEF MODE</p>";
+                    $.post("/chief/", {"key":e.key}).done(function(data) {
+                        console.log(data);
+                        document.getElementById("comm").innerHTML = "<p>NO COMMANDS</p>";
+                    });
+                };
+            } else if (e.key == "ArrowUp") {
+                $.post("/move/", {"key":e.key});
+                document.getElementById("comm").innerHTML = "<p>FORWARD</p>";
+            } else if (e.key == "ArrowDown") {
+                $.post("/move/", {"key":e.key});
+                document.getElementById("comm").innerHTML = "<p>BACKWARD</p>";
+            } else if (e.key == "ArrowRight") {
+                $.post("/move/", {"key":e.key});
+                document.getElementById("comm").innerHTML = "<p>TURN RIGHT</p>";
+            } else if (e.key == "ArrowLeft") {
+                $.post("/move/", {"key":e.key});
+                document.getElementById("comm").innerHTML = "<p>TURN LEFT</p>";
+            };
+        } else if (e.key == " ") {
+            $.post("/stop/").done(function(data) {
+                document.getElementById("comm").innerHTML = "<p>NO COMMANDS</p>";
+                moving = false
+            });
+        };
+    });
+
+});
+
+const video = document.querySelector('#myVidPlayer');
+window.navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+    video.srcObject = stream;
+    video.onloadedmetadata = (e) => {
+        video.play();
+    };
+}).catch( () => {
+    alert('Browser has not been givn necessary permissions.');
+});
+</script>>
+</html>
